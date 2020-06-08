@@ -1,0 +1,1 @@
+dotnet new blazorwasm -au IndividualB2C --aad-b2c-instance "https://sairamaapps.b2clogin.com/tfp/" --client-id "baf19ef3-9a3e-46e6-837e-008071b3bd36" --domain "sairamaapps.onmicrosoft.com" -ssp "B2C_1_signupsignin" -o ToolManager --hosted
