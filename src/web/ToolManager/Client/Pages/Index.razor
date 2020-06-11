@@ -1,3 +1,40 @@
 ﻿@page "/"
 
-<h1>Tools coming here</h1>
+<h1>Tool Manager</h1>
+
+@using ToolManager.Shared
+@inject HttpClient Http
+
+@if (tools == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var tool in tools)
+            {
+                <tr>
+                    <td>@tool.Name</td>
+                   <td>@((MarkupString) @tool.MarkdownInfo)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private ToolResource[] tools;
+
+    protected override async Task OnInitializedAsync()
+    {
+        tools = await Http.GetFromJsonAsync<ToolResource[]>("tools");
+    }
+
+}

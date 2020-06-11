@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <UserSecretsId>ToolManager.Server-A6752F7F-EC10-498E-ACE6-3CC17CB909CA</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,8 +13,5 @@
     <ProjectReference Include="..\Shared\ToolManager.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.AzureADB2C.UI" Version="3.1.3" />
-  </ItemGroup>
 
 </Project>
