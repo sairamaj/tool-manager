@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using StorageSample.Models;
+using ToolManager.Server.Models;
 
-namespace StorageSample
+namespace ToolManager.Server.Repository
 {
-    interface IStorageManager
+    public interface IStorageManager
     {
         Task CreateNewTool(ToolInfo toolInfo);
         IAsyncEnumerable<ToolInfo> Get();

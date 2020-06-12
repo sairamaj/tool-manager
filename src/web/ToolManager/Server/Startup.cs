@@ -6,6 +6,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Linq;
+using ToolManager.Server.Repository;
+using ToolManager.Server.Models;
 
 namespace ToolManager.Server
 {
@@ -22,7 +24,9 @@ namespace ToolManager.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-
+            services.AddOptions();
+            services.Configure<ConnectionInfo>(Configuration.GetSection("StorageConnection"));
+            services.AddTransient<IStorageManager, StorageManager>();
             services.AddControllersWithViews();
             services.AddRazorPages();
         }

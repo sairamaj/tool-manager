@@ -10,6 +10,10 @@ namespace ToolManager.Shared
         {
             get
             {
+                if (string.IsNullOrWhiteSpace(this.ReadMe))
+                {
+                    return string.Empty;
+                }
                 return Markdown.ToHtml(this.ReadMe);
             }
         }

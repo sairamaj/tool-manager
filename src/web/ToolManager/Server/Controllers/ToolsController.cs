@@ -5,6 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using ToolManager.Server.Repository;
+using ToolManager.Server.Models;
 
 namespace ToolManager.Server.Controllers
 {
@@ -13,26 +15,28 @@ namespace ToolManager.Server.Controllers
     public class ToolsController : ControllerBase
     {
         private readonly ILogger<ToolsController> logger;
+        private readonly IStorageManager storageManager;
 
-        public ToolsController(ILogger<ToolsController> logger)
+        public ToolsController(
+            ILogger<ToolsController> logger,
+            IStorageManager storageManager)
         {
             this.logger = logger;
+            this.storageManager = storageManager ?? throw new ArgumentNullException(nameof(storageManager));
         }
 
         [HttpGet]
-        public IEnumerable<ToolResource> Get()
+        public async Task<IEnumerable<ToolResource>> Get()
         {
-            return new List<ToolResource>{
-                new ToolResource{
-                    Name = "tool_1",
-                    ReadMe = System.IO.File.ReadAllText("test.MD")
-                },
-                new ToolResource{
-                    Name = "tool_2",
-                    ReadMe = System.IO.File.ReadAllText("test.MD")
-                }
+            var list =  new List<ToolResource>();
+            await foreach( var tool in  this.storageManager.Get() )
+            {
+                var resource = new ToolResource{ Name = tool.Name};
+                list.Add(resource);
+                resource.ReadMe = await this.storageManager.GetReadMe(resource.Name);
+            }
 
-            };
+            return list;
         }
     }
 }

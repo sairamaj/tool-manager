@@ -1,25 +1,25 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Azure.Management.Fluent;
-using Microsoft.Azure.Management.ResourceManager.Fluent;
-using Microsoft.Azure.Management.ResourceManager.Fluent.Authentication;
-using Microsoft.Azure.Management.ResourceManager.Fluent.Core;
-using Microsoft.Azure.Management.Storage.Fluent.Models;
+using Microsoft.Extensions.Options;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
-using StorageSample.Models;
+using ToolManager.Server.Models;
 
-namespace StorageSample
+namespace ToolManager.Server.Repository
 {
     class StorageManager : IStorageManager
     {
         private readonly ConnectionInfo connectionInfo;
         private const string ToolStoageResourceGroup = "toolmanager";
 
-        public StorageManager(ConnectionInfo connectionInfo)
+        public StorageManager(IOptions<ConnectionInfo> connectionInfo)
         {
-            this.connectionInfo = connectionInfo ?? throw new System.ArgumentNullException(nameof(connectionInfo));
+            if (connectionInfo is null)
+            {
+                throw new System.ArgumentNullException(nameof(connectionInfo));
+            }
+
+            this.connectionInfo = connectionInfo.Value ?? throw new System.ArgumentNullException(nameof(connectionInfo));
         }
 
         public CloudStorageAccount StorageAccount => CloudStorageAccount.Parse(this.connectionInfo.ToolStorageKey);
