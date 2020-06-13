@@ -43,8 +43,8 @@ else
 [Inject] BlazorDownloadFile.IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
 public async void DownloadFile(string toolName)
 {
-    var zipContent = await Http.GetStringAsync($"tools/download/{toolName}/zip");
-    await BlazorDownloadFileService.DownloadFileFromText($"{toolName}.txt",zipContent);
+    var zipContent = await Http.GetByteArrayAsync($"tools/download/{toolName}/zip");
+    await BlazorDownloadFileService.DownloadFile($"{toolName}.zip",zipContent);
 }
     protected override async Task OnInitializedAsync()
     {

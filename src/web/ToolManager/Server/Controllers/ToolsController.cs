@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ToolManager.Server.Repository;
 using ToolManager.Server.Models;
+using System.IO;
 
 namespace ToolManager.Server.Controllers
 {
@@ -42,9 +43,10 @@ namespace ToolManager.Server.Controllers
 
         [HttpGet]
         [Route("/tools/download/{name}/zip")]
-        public async Task<string> DownloadToolZip(string name)
+        public IActionResult DownloadToolZip(string name)
         {
-            return await Task.FromResult( $"{name} zip will be here" );
+            var filePath = @"c:\temp\test.zip";
+            return PhysicalFile(filePath, MimeTypes.GetMimeType(filePath), Path.GetFileName(filePath));
         }
     }
 }
