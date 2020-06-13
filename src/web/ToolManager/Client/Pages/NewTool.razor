@@ -1,9 +1,45 @@
 @page "/newtooldata"
 
+@using System.ComponentModel.DataAnnotations
+@using ToolManager.Shared
 @inject HttpClient Http
 
-<InputFile OnChange="HandleFileSelected" />
-@if (file != null)
+
+<EditForm Model="model" OnValidSubmit="Create">
+    <DataAnnotationsValidator/>
+     <div class="mat-layout-grid-cell mat-layout-grid-cell-span-4">
+                <p>
+                    <MatTextField Label="Name" @bind-Value="model.Name"/>
+                    <ValidationMessage For="@(() => model.Name)"/>
+                </p>
+     </div>
+     <div class="mat-layout-grid-cell mat-layout-grid-cell-span-12">
+                <p>
+                    <MatTextField Label="Description" @bind-Value="model.Description"/>
+                    <ValidationMessage For="@(() => model.Description)"/>
+                </p>
+     </div>
+     <div class="mat-layout-grid-cell mat-layout-grid-cell-span-12">
+                <p>
+                    <MatTextField Label="Tags" @bind-Value="model.Tags"/>
+                    <ValidationMessage For="@(() => model.Tags)"/>
+                </p>
+     </div>
+     <div class="mat-layout-grid-cell mat-layout-grid-cell-span-12">
+                <p>
+                    <span>Zip file:</span>
+                    <InputFile OnChange="HandleFileSelected" title="Zip file"/>
+                    @if (file != null){
+                        <p>Name: @file.Name</p>
+                    }
+                </p>
+     </div>
+
+     <div class="mat-layout-grid-cell mat-layout-grid-cell-span-4">
+                <MatButton Type="submit" Raised="true">Create</MatButton>
+            </div>
+</EditForm>
+@* @if (file != null)
 {
     <p>Name: @file.Name</p>
     <p>Size in bytes: @file.Size</p>
@@ -11,10 +47,11 @@
     <p>Content type (not always supplied by the browser): @file.Type</p>
 
     <MatButton Raised="true" OnClick="@Upload" Label="Upload"></MatButton>
-}
+} *@
 
 @code {
     IFileListEntry file;
+    NewToolInfo model = new NewToolInfo();
     string status = "";
     void HandleFileSelected(IFileListEntry[] files)
     {
@@ -34,5 +71,11 @@
     { new ByteArrayContent(ms.GetBuffer()), "\"upload\"", file.Name }
     };
         await Http.PostAsync("tools/upload/test/bin.zip", content);
+    }
+
+    async Task Create()
+    {
+        System.Console.WriteLine("Creating new tool...");
+        await Http.PostAsJsonAsync<NewToolInfo>("tools", model);
     }
 }

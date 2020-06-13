@@ -52,6 +52,16 @@ namespace ToolManager.Server.Controllers
             var filePath = @"c:\temp\test.zip";
             return PhysicalFile(filePath, MimeTypes.GetMimeType(filePath), Path.GetFileName(filePath));
         }
+        [HttpPost]
+        [Route("/tools")]
+        public async Task NewToolPost(NewToolInfo toolInfo)
+        {
+            await this.storageManager.CreateNewTool(new ToolInfo{
+                Name = toolInfo.Name,
+                Description = toolInfo.Description,
+                Tags = toolInfo.Tags
+            });
+        }
 
         [HttpPost]
         [Route("/tools/upload/{name}/{filename}")]

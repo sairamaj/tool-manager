@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Microsoft.WindowsAzure.Storage;
@@ -11,7 +12,7 @@ namespace ToolManager.Server.Repository
     class FakeStorageManager : IStorageManager
     {
         private readonly ConnectionInfo connectionInfo;
-        private const string ToolStoageResourceGroup = "toolmanager";
+        private const string ToolsDirectory = @"c:\temp\toolmanager";
 
         public FakeStorageManager(IOptions<ConnectionInfo> connectionInfo)
         {
@@ -27,13 +28,11 @@ namespace ToolManager.Server.Repository
 
         public async Task CreateNewTool(ToolInfo toolInfo)
         {
-            var blobClient = this.StorageAccount.CreateCloudBlobClient();
-            var container = blobClient.GetContainerReference(toolInfo.Name);
-            await container.CreateIfNotExistsAsync();
-            var readMeBlob = container.GetBlockBlobReference("readme.md");
-            await readMeBlob.UploadFromFileAsync(@"c:\temp\tool3\readme.md");
-            var zipBlob = container.GetBlockBlobReference("bin.zip");
-            await zipBlob.UploadFromFileAsync(@"C:\temp\tool3\bin\tool3bin.zip");
+            var newTool = Path.Combine(ToolsDirectory, toolInfo.Name);
+            Directory.CreateDirectory(newTool);
+            var metaData = $"author=foo|description={toolInfo.Description}|tags={toolInfo.Tags}";
+            var metadatFile = Path.Combine(newTool, "metadata.txt");
+            await File.WriteAllTextAsync(metadatFile, metaData, Encoding.UTF8);
         }
 
         public async IAsyncEnumerable<ToolInfo> Get()
