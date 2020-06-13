@@ -1,0 +1,38 @@
+@page "/newtooldata"
+
+@inject HttpClient Http
+
+<InputFile OnChange="HandleFileSelected" />
+@if (file != null)
+{
+    <p>Name: @file.Name</p>
+    <p>Size in bytes: @file.Size</p>
+    <p>Last modified date: @file.LastModified.ToShortDateString()</p>
+    <p>Content type (not always supplied by the browser): @file.Type</p>
+
+    <MatButton Raised="true" OnClick="@Upload" Label="Upload"></MatButton>
+}
+
+@code {
+    IFileListEntry file;
+    string status = "";
+    void HandleFileSelected(IFileListEntry[] files)
+    {
+        file = files.FirstOrDefault();
+    }
+
+    async Task Upload()
+    {
+        // Just load into .NET memory to show it can be done
+        // Alternatively it could be saved to disk, or parsed in memory, or similar
+        var ms = new System.IO.MemoryStream();
+        await file.Data.CopyToAsync(ms);
+
+        status = $"Finished loading {file.Size} bytes from {file.Name}";
+
+        var content = new MultipartFormDataContent {
+    { new ByteArrayContent(ms.GetBuffer()), "\"upload\"", file.Name }
+    };
+        await Http.PostAsync("tools/upload/test/bin.zip", content);
+    }
+}
