@@ -26,7 +26,7 @@ namespace ToolManager.Server
         {
             services.AddOptions();
             services.Configure<ConnectionInfo>(Configuration.GetSection("StorageConnection"));
-            services.AddTransient<IStorageManager, StorageManager>();
+            services.AddTransient<IStorageManager, FakeStorageManager>();
             services.AddControllersWithViews();
             services.AddRazorPages();
         }

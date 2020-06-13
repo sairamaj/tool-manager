@@ -26,6 +26,7 @@ namespace ToolManager.Server.Controllers
         }
 
         [HttpGet]
+        [Route("/tools")]
         public async Task<IEnumerable<ToolResource>> Get()
         {
             var list =  new List<ToolResource>();
@@ -37,6 +38,13 @@ namespace ToolManager.Server.Controllers
             }
 
             return list;
+        }
+
+        [HttpGet]
+        [Route("/tools/download/{name}/zip")]
+        public async Task<string> DownloadToolZip(string name)
+        {
+            return await Task.FromResult( $"{name} zip will be here" );
         }
     }
 }

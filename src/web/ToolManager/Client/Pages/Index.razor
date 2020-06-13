@@ -4,6 +4,8 @@
 
 @using ToolManager.Shared
 @inject HttpClient Http
+@inject IJSRuntime JSRuntime
+
 
 @if (tools == null)
 {
@@ -11,27 +13,39 @@
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Name</th>
-            </tr>
-        </thead>
-        <tbody>
+    <h1>Blazor Download File</h1>
+
+ 
+    <MatAccordion Multi="true">
             @foreach (var tool in tools)
             {
-                <tr>
-                    <td>@tool.Name</td>
-                   <td>@((MarkupString) @tool.MarkdownInfo)</td>
-                </tr>
+                <MatExpansionPanel>
+                    <MatExpansionPanelSummary>
+                        <MatExpansionPanelHeader>@tool.Name</MatExpansionPanelHeader>
+                        <MatExpansionPanelHeader>
+                            <MatButton Raised="true" OnClick="(() => DownloadFile(tool.Name))" Label="Download"></MatButton>
+                        </MatExpansionPanelHeader>
+                    </MatExpansionPanelSummary>
+                    <MatExpansionPanelDetails>
+                        <p>@((MarkupString) @tool.MarkdownInfo)</p>
+                    </MatExpansionPanelDetails>
+                </MatExpansionPanel>
             }
-        </tbody>
-    </table>
+    </MatAccordion>
 }
 
 @code {
     private ToolResource[] tools;
 
+@code {
+}    
+
+[Inject] BlazorDownloadFile.IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
+public async void DownloadFile(string toolName)
+{
+    var zipContent = await Http.GetStringAsync($"tools/download/{toolName}/zip");
+    await BlazorDownloadFileService.DownloadFileFromText($"{toolName}.txt",zipContent);
+}
     protected override async Task OnInitializedAsync()
     {
         tools = await Http.GetFromJsonAsync<ToolResource[]>("tools");
