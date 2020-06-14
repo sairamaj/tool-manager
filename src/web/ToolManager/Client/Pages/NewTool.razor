@@ -28,10 +28,34 @@
      </div>
      <div class="mat-layout-grid-cell mat-layout-grid-cell-span-12">
                 <p>
+                    <MatTextField Label="Source Url" @bind-Value="model.SourceUrl"/>
+                    <ValidationMessage For="@(() => model.SourceUrl)"/>
+                </p>
+     </div>
+     <div class="mat-layout-grid-cell mat-layout-grid-cell-span-12">
+                <p>
+                    <span>ReadMe:</span>
+                    <InputFile OnChange="HandleReadMeSelected"/>
+                    @if (readMeFile != null){
+                        <p>Name: @readMeFile.Name</p>
+                    }
+                </p>
+     </div>
+     <div class="mat-layout-grid-cell mat-layout-grid-cell-span-12">
+                <p>
                     <span>Zip file:</span>
-                    <InputFile OnChange="HandleFileSelected" title="Zip file"/>
-                    @if (file != null){
-                        <p>Name: @file.Name</p>
+                    <InputFile OnChange="HandleZipFileSelected"/>
+                    @if (zipFile != null){
+                        <p>Name: @zipFile.Name</p>
+                    }
+                </p>
+     </div>
+     <div class="mat-layout-grid-cell mat-layout-grid-cell-span-12">
+                <p>
+                    <span>Screen shot:</span>
+                    <InputFile OnChange="HandleScreenShotFileSelected"/>
+                    @if (screenShotImageFile != null){
+                        <p>Name: @screenShotImageFile.Name</p>
                     }
                 </p>
      </div>
@@ -40,53 +64,73 @@
                 <MatButton Type="submit" Raised="true">Create</MatButton>
             </div>
 </EditForm>
-@if (file != null)
-{
-    <p>Name: @file.Name</p>
-    <p>Size in bytes: @file.Size</p>
-    <p>Last modified date: @file.LastModified.ToShortDateString()</p>
-    <p>Content type (not always supplied by the browser): @file.Type</p>
-
-    <MatButton Raised="true" OnClick="@Upload" Label="Upload"></MatButton>
-}
 
 @code {
-    IFileListEntry file;
+    IFileListEntry zipFile;
+    IFileListEntry readMeFile;
+    IFileListEntry screenShotImageFile;
+
     NewToolInfo model = new NewToolInfo();
     string status = "";
-    void HandleFileSelected(IFileListEntry[] files)
+    void HandleZipFileSelected(IFileListEntry[] files)
     {
-        file = files.FirstOrDefault();
+        zipFile = files.FirstOrDefault();
+    }
+    void HandleReadMeSelected(IFileListEntry[] files)
+    {
+        readMeFile = files.FirstOrDefault();
+    }
+    void HandleScreenShotFileSelected(IFileListEntry[] files)
+    {
+        screenShotImageFile = files.FirstOrDefault();
     }
 
-    async Task Upload()
+    async Task Upload(IFileListEntry file)
     {
         // Just load into .NET memory to show it can be done
         // Alternatively it could be saved to disk, or parsed in memory, or similar
         var ms = new MemoryStream();
         await file.Data.CopyToAsync(ms);
 
-var data = "";
-
-   ms.Position = 0;
-   var sr = new System.IO.StreamReader(ms);
-   data = sr.ReadToEnd();
-       
         status = $"Finished loading {file.Size} bytes from {file.Name}";
 
-        @* var content = new MultipartFormDataContent {
-    { new ByteArrayContent(ms.GetBuffer()), "\"upload\"", file.Name }
-    }; *@
-        var content = new MultipartFormDataContent {
-    { new StringContent(data), "\"upload\"", file.Name }
+        var content = new MultipartFormDataContent
+    {
+    { CreateContent(Path.GetExtension(file.Name),ms), "\"upload\"", file.Name }
     };
         await Http.PostAsync($"tools/upload/{model.Name}/{file.Name}", content);
     }
 
+    HttpContent CreateContent(string extension, MemoryStream ms)
+    {
+        System.Console.WriteLine($"CreateContent :{extension}");
+        switch (extension.ToUpperInvariant())
+        {
+            case ".MD":
+                ms.Position = 0;
+                var sr = new System.IO.StreamReader(ms);
+                var data = sr.ReadToEnd();
+                return new StringContent(data);
+
+            default:
+                return new ByteArrayContent(ms.GetBuffer());
+        }
+    }
     async Task Create()
     {
         System.Console.WriteLine("Creating new tool...");
         await Http.PostAsJsonAsync<NewToolInfo>("tools", model);
-        await Upload();
+        if (this.zipFile != null)
+        {
+            await Upload(this.zipFile);
+        }
+        if (this.readMeFile != null)
+        {
+            await Upload(this.readMeFile);
+        }
+        if (this.screenShotImageFile != null)
+        {
+            await Upload(this.screenShotImageFile);
+        }
     }
 }

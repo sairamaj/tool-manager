@@ -12,6 +12,7 @@ namespace ToolManager.Shared
         
         [Required]
         public string Tags { get; set; }
+        public string SourceUrl {get; set;}
 
         public override string ToString(){
             var info = string.Empty;
