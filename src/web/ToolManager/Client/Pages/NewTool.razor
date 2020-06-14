@@ -2,6 +2,7 @@
 
 @using System.ComponentModel.DataAnnotations
 @using ToolManager.Shared
+@using System.IO
 @inject HttpClient Http
 
 
@@ -39,7 +40,7 @@
                 <MatButton Type="submit" Raised="true">Create</MatButton>
             </div>
 </EditForm>
-@* @if (file != null)
+@if (file != null)
 {
     <p>Name: @file.Name</p>
     <p>Size in bytes: @file.Size</p>
@@ -47,7 +48,7 @@
     <p>Content type (not always supplied by the browser): @file.Type</p>
 
     <MatButton Raised="true" OnClick="@Upload" Label="Upload"></MatButton>
-} *@
+}
 
 @code {
     IFileListEntry file;
@@ -62,20 +63,30 @@
     {
         // Just load into .NET memory to show it can be done
         // Alternatively it could be saved to disk, or parsed in memory, or similar
-        var ms = new System.IO.MemoryStream();
+        var ms = new MemoryStream();
         await file.Data.CopyToAsync(ms);
 
+var data = "";
+
+   ms.Position = 0;
+   var sr = new System.IO.StreamReader(ms);
+   data = sr.ReadToEnd();
+       
         status = $"Finished loading {file.Size} bytes from {file.Name}";
 
-        var content = new MultipartFormDataContent {
+        @* var content = new MultipartFormDataContent {
     { new ByteArrayContent(ms.GetBuffer()), "\"upload\"", file.Name }
+    }; *@
+        var content = new MultipartFormDataContent {
+    { new StringContent(data), "\"upload\"", file.Name }
     };
-        await Http.PostAsync("tools/upload/test/bin.zip", content);
+        await Http.PostAsync($"tools/upload/{model.Name}/{file.Name}", content);
     }
 
     async Task Create()
     {
         System.Console.WriteLine("Creating new tool...");
         await Http.PostAsJsonAsync<NewToolInfo>("tools", model);
+        await Upload();
     }
 }

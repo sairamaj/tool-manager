@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Microsoft.WindowsAzure.Storage;
@@ -68,5 +69,9 @@ namespace ToolManager.Server.Repository
             return await readMeBlob.DownloadTextAsync();
         }
 
+        public Task Upload(string toolName, string name, Stream stream)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

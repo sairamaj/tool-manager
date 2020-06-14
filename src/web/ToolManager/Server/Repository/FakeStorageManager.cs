@@ -38,15 +38,29 @@ namespace ToolManager.Server.Repository
         public async IAsyncEnumerable<ToolInfo> Get()
         {
             await Task.Delay(0);
-            yield return new ToolInfo { Name = "Tool1" };
-            yield return new ToolInfo { Name = "Tool2" };
-            yield return new ToolInfo { Name = "Tool3" };
+            foreach(var subDir in Directory.GetDirectories(ToolsDirectory)){
+                yield return new ToolInfo { Name = Path.GetFileName(subDir) };
+            }
         }
 
         public async Task<string> GetReadMe(string toolName)
         {
-            return File.ReadAllText(@"c:\temp\readme.md");
+            var readMeFile = Path.Combine(ToolsDirectory, toolName, "readme.MD");           
+            if( !File.Exists(readMeFile)){
+                return "# Readme.MD not found.";
+            }
+
+            return await File.ReadAllTextAsync(readMeFile, Encoding.UTF8);
         }
 
+        public async Task Upload(string toolName, string name, Stream stream)
+        {
+            var toolPath = Path.Combine(ToolsDirectory, toolName, name);           
+            using(var file = File.OpenWrite(toolPath))
+            {
+                System.Console.WriteLine($"stream length: {stream.Length}");
+                await stream.CopyToAsync(file);
+            }
+        }
     }
 }
