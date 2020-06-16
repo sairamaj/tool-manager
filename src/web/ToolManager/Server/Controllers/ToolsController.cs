@@ -81,7 +81,6 @@ namespace ToolManager.Server.Controllers
                     System.Console.WriteLine($"ContentDisposition: {file.ContentDisposition}");
                     System.Console.WriteLine($"ContentRootPath: {environment.ContentRootPath}");
                     System.Console.WriteLine("=========================");
-                    var path = Path.Combine(environment.ContentRootPath, "uploads", file.FileName);
                     await this.storageManager.Upload(name, filename, file.OpenReadStream());
                     // using (var stream = new FileStream(path, FileMode.Create))
                     // {

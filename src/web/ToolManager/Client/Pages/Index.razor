@@ -21,12 +21,19 @@ else
                 <MatExpansionPanel>
                     <MatExpansionPanelSummary>
                         <MatExpansionPanelHeader>@tool.Name</MatExpansionPanelHeader>
-                        <MatExpansionPanelHeader>
-                            <MatButton Raised="true" OnClick="(() => DownloadFile(tool.Name))" Label="Download"></MatButton>
-                        </MatExpansionPanelHeader>
                     </MatExpansionPanelSummary>
                     <MatExpansionPanelDetails>
-                        <p>@((MarkupString) @tool.MarkdownInfo)</p>
+                    <div class="mat-layout-grid">
+                        <div class="mat-layout-grid-inner">
+                            <div class="mat-layout-grid-cell mat-layout-grid-cell-span-8">
+
+                            </div>
+                            <div class="mat-layout-grid-cell mat-layout-grid-cell-span-4">
+                            <MatButton Raised="true" OnClick="(() => DownloadFile(tool.Name))" Label="Download"></MatButton>
+                            </div>
+                        </div>
+                    </div>
+                    <p>@((MarkupString) @tool.MarkdownInfo)</p>    
                     </MatExpansionPanelDetails>
                 </MatExpansionPanel>
             }
